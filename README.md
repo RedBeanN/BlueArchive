@@ -2,6 +2,8 @@
 
 一个奇怪的蔚蓝档案(BA)库, 用 `sharp.js` 合成各种奇怪的图片.
 
+[![NPM Version](https://img.shields.io/npm/v/blue-archive)](https://www.npmjs.com/package/blue-archive)
+
 当前计划/实现:
 
 - [ ] 动态更新数据
@@ -10,6 +12,15 @@
 - [ ] 资料卡(懒)
 - [ ] 模拟抽卡(咕咕咕)
 - [ ] 关卡资料(大概不会做)
+
+## Installation
+
+```sh
+# using npm
+npm i -S blue-archive
+# using yarn
+yarn add blue-archive
+```
 
 ## `students`
 
