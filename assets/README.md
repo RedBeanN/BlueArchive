@@ -1,0 +1,1 @@
+The `data` and `icons` are downloaded from [lonqie/SchaleDB](https://github.com/lonqie/SchaleDB)
