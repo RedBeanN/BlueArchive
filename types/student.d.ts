@@ -126,11 +126,7 @@ export interface Student {
     WeaponType: string,
     WeaponImg: string,
     Cover: boolean,
-    Equipment: [
-        Hat,
-        Hairpin,
-        Watch
-    ],
+    Equipment: string[],
     CollectionBG: string,
     CollectionTexture: string,
     FamilyName: string,

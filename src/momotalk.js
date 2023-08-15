@@ -2,23 +2,31 @@ const { resolve } = require('path')
 const sharp = require('sharp')
 const escapeHtml = require('../utils/escapeHtml')
 
-const globalConfig = {
+const momoConfig = {
   title: 'MomoTalk',
+  titleBackground: '#fa97ab',
+  titleIcon: '',
   kizunaTitle: '好感故事',
-  optionTitle: '回复'
+  optionTitle: '回复',
 }
 /**
- * @param { { title?: string, kizunaTitle?: string, optionTitle?: string } } conf
+ * @param { {
+ *  title?: string,
+ *  titleBackground?: string,
+ *  titleIcon?: string|Buffer|import('stream').Duplex,
+ *  kizunaTitle?: string,
+ *  optionTitle?: string,
+ * } } conf
  */
 const setConfig = conf => {
   for (const key in conf) {
-    if (!(key in globalConfig)) {
+    if (!(key in momoConfig)) {
       console.warn(`Unknown key ${key} for momotalk config`)
       continue
     }
     const val = conf[key].trim()
     if (!val) console.warn(`Invalid value for momotalk config key ${key}: ${conf[key]}`)
-    else globalConfig[key] = val
+    else momoConfig[key] = val
   }
 }
 
@@ -80,7 +88,7 @@ const textPng = ({
 const drawStudent = async (talk, draw, move, images = []) => {
   const lines = talk.content.split('\n').map(i => i.trim()).filter(i => i)
   const s = talk.student
-  const name = s.Name
+  const name = s.DisplayName || s.Name
   const icon = s.Icon ? s.Icon : resolve(__dirname, `../assets/icons/${s.CollectionTexture}.png`)
   const ch = move()
   const circIcon = sharp(icon).resize(64, 64).png().composite([{
@@ -88,6 +96,10 @@ const drawStudent = async (talk, draw, move, images = []) => {
     blend: 'dest-in'
   }])
   draw({
+    input: Buffer.from(`<svg><rect x="0" y="0" width="64" height="64" rx="32" ry="32" fill="white"/></svg>`),
+    left: 12,
+    top: ch
+  }, {
     input: await circIcon.toBuffer(),
     left: 12,
     top: ch
@@ -271,7 +283,7 @@ const drawOptions = async (talk, draw, move, images = []) => {
   const width = imageWidth - 116
   let height = 0
   const title = textPng({
-    text: globalConfig.optionTitle,
+    text: momoConfig.optionTitle,
     color: textColor,
     maxWidth: width - 20
   })
@@ -348,13 +360,13 @@ const drawOptions = async (talk, draw, move, images = []) => {
  * @param { (h?: number) => number } move
  */
 const drawKizuna = async (talk, draw, move) => {
-  const name = talk.student.Name
+  const name = talk.student.DisplayName || talk.student.Name
   const content = talk.content.trim() || `进入${name}的好感故事`
   // background: #ffedf1
   const width = imageWidth - 116
   let height = 0
   const title = textPng({
-    text: globalConfig.kizunaTitle,
+    text: momoConfig.kizunaTitle,
     color: '#4b5a6f',
     maxWidth: width - 20
   })
@@ -433,7 +445,7 @@ const momotalk = async (talks, images = [], watermark = '') => {
       width: imageWidth - 12,
       height: 64,
       channels: 4,
-      background: '#fa97ab'
+      background: momoConfig.titleBackground
     }
   }).composite([{
     input: roundSvg({ width: imageWidth - 12, height: 64, rx: 18, ry: 18 }),
@@ -444,12 +456,12 @@ const momotalk = async (talks, images = [], watermark = '') => {
     left: 6,
     top: move()
   }, {
-    input: await sharp(momoSvg).resize(36, 36).png().toBuffer(),
+    input: await sharp(momoConfig.titleIcon || momoSvg).resize(36, 36).png().toBuffer(),
     left: 24,
     top: move() + 12,
   }, {
     input: await textPng({
-      text: globalConfig.title,
+      text: momoConfig.title,
       fontSize: 36,
       color: 'white',
       font: miSans,

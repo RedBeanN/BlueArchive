@@ -39,7 +39,7 @@ const getStudentById = (id = 0, lang = 'cn') => {
  */
 const searchByName = (name = '', specs = []) => {
   const found = []
-  const lc = name.toLowerCase()
+  const lc = name.toLowerCase().replace(/（/g, '(').replace(/）/g, ')')
   const searching = []
   if (specs.length) {
     searching.push(specs)
@@ -68,6 +68,10 @@ const searchByName = (name = '', specs = []) => {
       }
     }
   }
+  // 水宫子 => 宫子(泳装)
+  if (!found.length && lc.startsWith('水')) {
+    return searchByName(lc.substring(1) + '(泳装)', specs)
+  }
   return found
 }
 const getStudentsByName = (name = '', specs = []) => {
@@ -82,4 +86,12 @@ const getStudentsByName = (name = '', specs = []) => {
   return cns.filter(i => i)
 }
 
-module.exports = { getStudentsByName, getStudentById }
+/**
+ * @param { 'cn'|'jp'|'en'|'tw'|'kr'|'th'|'vi' } lang
+ */
+const getAll = (lang = 'cn') => {
+  initStudentMap()
+  return studentMap.get(lang)
+}
+
+module.exports = { getStudentsByName, getStudentById, getAll }

@@ -1,0 +1,41 @@
+{
+  "cn": {
+    "squard_main": "突击",
+    "squard_support": "支援",
+    "pos_front": "前排",
+    "pos_mid": "中排",
+    "pos_back": "后排",
+    "no_favor_item": "该学生没有喜好物品",
+    "no_furniture": "该学生没有交互家具",
+    "skill_normal": "普通技能",
+    "skill_passive": "被动技能",
+    "skill_ex": "EX技能",
+    "skill_sub": "子技能"
+  },
+  "jp": {
+    "squard_main": "STRIKE",
+    "squard_support": "SUPPORT",
+    "pos_front": "FRONT",
+    "pos_mid": "MIDDLE",
+    "pos_back": "BACK",
+    "no_favor_item": "该学生没有喜好物品",
+    "no_furniture": "该学生没有交互家具",
+    "skill_normal": "Skill",
+    "skill_passive": "Passive",
+    "skill_ex": "EX",
+    "skill_sub": "Sub Skill"
+  },
+  "en": {
+    "squard_main": "STRIKE",
+    "squard_support": "SUPPORT",
+    "pos_front": "FRONT",
+    "pos_mid": "MIDDLE",
+    "pos_back": "BACK",
+    "no_favor_item": "该学生没有喜好物品",
+    "no_furniture": "该学生没有交互家具",
+    "skill_normal": "Skill",
+    "skill_passive": "Passive",
+    "skill_ex": "EX",
+    "skill_sub": "Sub Skill"
+  }
+}
