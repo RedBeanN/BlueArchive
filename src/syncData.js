@@ -7,7 +7,7 @@ const parallel = require('../utils/parallel')
 
 const dataRepo = 'https://github.com/lonqie/SchaleDB'
 
-const langs = ['cn', 'jp', 'en', 'tw', 'kr', 'th', 'vi']
+const langs = ['cn', 'jp', 'en', 'tw', 'kr', 'th']
 
 const downloadWithRetry = async (url = '', dist = '', force = false) => {
   const isImage = dist.endsWith('.png') || dist.endsWith('.webp')
@@ -70,7 +70,7 @@ const syncData = async (log = () => {}) => {
       const url = `${dataRepo}/raw/main/data/${lang}/${file}.json`
       const dist = resolve(__dirname, `../assets/data/${lang}/${file}.json`)
       if (await downloadWithRetry(url, dist, true)) {
-        log('Downloaded', file)
+        log(`[${lang}] Downloaded`, file)
       }
     }, files.length)
   }
@@ -87,12 +87,14 @@ const syncData = async (log = () => {}) => {
   const skills = []
   for (const s of jpData) {
     n++
-    const texture = s.CollectionTexture
+    // const texture = s.CollectionTexture
+    const texture = s.PathName
     const devName = s.DevName
+    const id = s.Id
     const localIcon = resolve(__dirname, `../assets/icons/${texture}.png`)
-    const remoteIcon = `${dataRepo}/raw/main/images/student/icon/${texture}.png`
-    const localPortrait = resolve(__dirname, `../assets/portraits/${devName}.webp`)
-    const remotePortrait = `${dataRepo}/raw/main/images/student/portrait/Portrait_${devName}.webp`
+    const remoteIcon = `${dataRepo}/raw/main/images/student/icon/${id}.webp`
+    const localPortrait = resolve(__dirname, `../assets/portraits/${devName}.png`)
+    const remotePortrait = `${dataRepo}/raw/main/images/student/portrait/${id}.webp`
     if (await downloadWithRetry(remoteIcon, localIcon)) {
       log(`Icon: ${texture} ${s.Name}`)
     }
@@ -102,8 +104,8 @@ const syncData = async (log = () => {}) => {
     log(`Students: (${n}/${jpData.length})`)
     if (!schools.includes(s.School)) schools.push(s.School)
     if (!weapons.includes(s.WeaponImg)) weapons.push(s.WeaponImg)
-    if (s.Gear && s.Gear.Icon) {
-      if (!gears.includes(s.Gear.Icon)) gears.push(s.Gear.Icon)
+    if (s.Gear && s.Gear.Name) {
+      if (!gears.includes(id)) gears.push(id)
     }
     s.Skills.forEach(s => {
       if (s.Icon && !skills.includes(s.Icon)) skills.push(s.Icon)
@@ -124,7 +126,7 @@ const syncData = async (log = () => {}) => {
   // Weapon icons
   await parallel(weapons, async w => {
     const local = resolve(__dirname, `../assets/weapons/${w}.png`)
-    const remote = `${dataRepo}/raw/main/images/weapon/${w}.png`
+    const remote = `${dataRepo}/raw/main/images/weapon/${w}.webp`
     if (await downloadWithRetry(remote, local)) {
       log(`Weapon: ${w}`)
     }
@@ -132,7 +134,7 @@ const syncData = async (log = () => {}) => {
   // console.log('Weapon done')
   await parallel(gears, async w => {
     const local = resolve(__dirname, `../assets/gears/${w}.png`)
-    const remote = `${dataRepo}/raw/main/images/gear/${w}.png`
+    const remote = `${dataRepo}/raw/main/images/gear/icon/${w}.webp`
     if (await downloadWithRetry(remote, local)) {
       log(`Gear: ${w}`)
     }
@@ -141,7 +143,7 @@ const syncData = async (log = () => {}) => {
   await parallel(skills, async w => {
     const local = resolve(__dirname, `../assets/skills/${w}.png`)
     // console.log(local, existsSync(local))
-    const remote = `${dataRepo}/raw/main/images/skill/${w}.png`
+    const remote = `${dataRepo}/raw/main/images/skill/${w}.webp`
     if (await downloadWithRetry(remote, local)) {
       log(`Skill: ${w}`)
     }
@@ -152,7 +154,7 @@ const syncData = async (log = () => {}) => {
   const equips = ['Badge', 'Bag', 'Charm', 'Gloves', 'Hairpin', 'Hat', 'Necklace', 'Shoes', 'Watch']
   await parallel(equips, async e => {
     const local = resolve(__dirname, `../assets/equipments/${e}.png`)
-    const remote = `${dataRepo}/raw/main/images/equipment/Equipment_Icon_${e}_Tier8.png`
+    const remote = `${dataRepo}/raw/main/images/equipment/icon/equipment_icon_${e.toLowerCase()}_tier8.webp`
     if (await downloadWithRetry(remote, local)) {
       log(`Equipment: ${e}`)
     }
@@ -178,7 +180,7 @@ const syncData = async (log = () => {}) => {
   await parallel(jpItemData, async item => {
     const { Id, Icon, Name } = item
     const local = resolve(__dirname, `../assets/items/${Id}.png`)
-    const remote = `${dataRepo}/raw/main/images/items/${Icon}.png`
+    const remote = `${dataRepo}/raw/main/images/item/icon/${Icon}.webp`
     if (await downloadWithRetry(remote, local)) {
       log(`Item: ${Id}. ${Name}`)
     }
@@ -189,7 +191,7 @@ const syncData = async (log = () => {}) => {
   await parallel(jpFurnitureData, async item => {
     const { Id, Icon, Name } = item
     const local = resolve(__dirname, `../assets/furnitures/${Id}.png`)
-    const remote = `${dataRepo}/raw/main/images/furniture/${Icon}.png`
+    const remote = `${dataRepo}/raw/main/images/furniture/icon/${Icon}.webp`
     if (await downloadWithRetry(remote, local)) {
       log(`Furniture: ${Id}. ${Name}`)
     }
@@ -219,11 +221,11 @@ const syncData = async (log = () => {}) => {
 
   // Others
   const others = [
-    { Name: 'Credits', Icon: 'items/Currency_Icon_Gold' },
+    { Name: 'Credits', Icon: 'currency_icon_gold' },
   ]
   await parallel(others, async ({ Name, Icon }) => {
     const local = resolve(__dirname, `../assets/others/${Name}.png`)
-    const remote = `${dataRepo}/raw/main/images/${Icon}.png`
+    const remote = `${dataRepo}/raw/main/images/item/icon/${Icon}.png`
     if (await downloadWithRetry(remote, local)) {
       log(`Other: ${Name} ${Icon}`)
     }

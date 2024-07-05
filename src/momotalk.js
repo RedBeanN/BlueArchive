@@ -37,17 +37,20 @@ const setConfig = conf => {
  * @prop { Student } [student]
  * @prop { string|string[] } content
  */
-const imageWidth = 720
+const imageWidth = 1080
+const fz = (n = 1) => imageWidth / 90 * n
 const miSansFile = resolve(__dirname, '../assets/fonts/MiSans-Bold.ttf')
 const miSans = 'MiSans Bold'
-const defaultFontfile = resolve(__dirname, '../assets/fonts/Yuanti SC.ttc')
-const defaultFont = 'Yuanti SC Bold'
+// const defaultFontfile = resolve(__dirname, '../assets/fonts/Yuanti SC.ttc')
+// const defaultFont = 'Yuanti SC Bold'
+const defaultFontfile = resolve(__dirname, '../assets/fonts/ResourceHanRoundedCN.ttf')
+const defaultFont = 'Resource Han Rounded CN Medium'
 
 const black = '#2a323e'
 const white = '#ecf2fb'
 const fontGrey = '#87929e'
 const chatBorderColor = '#cdd3dc'
-const roundSvg = ({ width = imageWidth, height = 32, rx = 16, ry = 16 }) => {
+const roundSvg = ({ width = imageWidth, height = fz(4), rx = fz(2), ry = fz(2) }) => {
   return Buffer.from(`<svg><rect x="0" y="0" width="${width}" height="${height}" rx="${rx}" ry="${ry}" paint-order="stroke"/></svg>`)
 }
 const momoSvg = Buffer.from(`<svg x="0" y="0" viewBox="0 0 512 477.9" fill="#fff" >
@@ -57,7 +60,7 @@ const momoSvg = Buffer.from(`<svg x="0" y="0" viewBox="0 0 512 477.9" fill="#fff
 
 const textPng = ({
   text = '',
-  fontSize = 32,
+  fontSize = fz(4),
   color = '#000',
   align = 'left',
   maxWidth = imageWidth,
@@ -91,38 +94,38 @@ const drawStudent = async (talk, draw, move, images = []) => {
   const name = s.DisplayName || s.Name
   const icon = s.Icon ? s.Icon : resolve(__dirname, `../assets/icons/${s.CollectionTexture}.png`)
   const ch = move()
-  const circIcon = sharp(icon).resize(64, 64).png().composite([{
-    input: roundSvg({ width: 64, height: 64, rx: 32, ry: 32 }),
+  const circIcon = sharp(icon).resize(fz(8), fz(8)).png().composite([{
+    input: roundSvg({ width: fz(8), height: fz(8), rx: fz(4), ry: fz(4) }),
     blend: 'dest-in'
   }])
   draw({
-    input: Buffer.from(`<svg><rect x="0" y="0" width="64" height="64" rx="32" ry="32" fill="white"/></svg>`),
-    left: 12,
+    input: Buffer.from(`<svg><rect x="0" y="0" width="${fz(8)}" height="${fz(8)}" rx="${fz(4)}" ry="${fz(4)}" fill="white"/></svg>`),
+    left: fz(1.5),
     top: ch
   }, {
     input: await circIcon.toBuffer(),
-    left: 12,
+    left: fz(1.5),
     top: ch
   })
-  let th = -8
+  let th = -fz(1)
   for (const line of lines) {
-    const isFirst = th === -8
+    const isFirst = th === -fz(1)
     const texts = line.split(/\[img\:(\d+)\]/g)
     if (isFirst) {
-      const sname = textPng({ text: name, color: '#4b5a6f', fontSize: 24 })
+      const sname = textPng({ text: name, color: '#4b5a6f', fontSize: fz(3) })
       draw({
         input: await sname.toBuffer(),
-        left: 96,
-        top: move() + 4 + th
+        left: fz(12),
+        top: move() + fz(0.5) + th
       })
-      th += (await sname.metadata()).height + 12
+      th += (await sname.metadata()).height + fz(1.5)
       if (texts[0]?.trim()) {
         draw({
-          input: Buffer.from(`<svg height="10" width="12">
-            <polygon points="0,5 12,0 12,10" style="fill:#4b5a6f" />
+          input: Buffer.from(`<svg height="${fz(1.5)}" width="${fz(1.5)}">
+            <polygon points="0,${fz(0.75)} ${fz(1.5)},0 ${fz(1.5)},${fz(1.5)}" style="fill:#4b5a6f" />
           </svg>`),
-          left: 84,
-          top: move() + 12 + th
+          left: fz(10.5),
+          top: move() + fz(1.5) + th
         })
       }
     }
@@ -132,40 +135,40 @@ const drawStudent = async (talk, draw, move, images = []) => {
         isImage = false
         const content = images[Number(line) - 1]
         if (!content) continue
-        const img = sharp(await sharp(content).resize(300).toBuffer())
+        const img = sharp(await sharp(content).resize(fz(37.5)).toBuffer())
         const meta = await img.metadata()
         // console.log(meta.width, meta.height)
         const buf = await img.composite([{
-          input: roundSvg({ width: meta.width, height: meta.height, rx: 12, ry: 12 }),
+          input: roundSvg({ width: meta.width, height: meta.height, rx: fz(1.5), ry: fz(1.5) }),
           blend: 'dest-in'
         }, {
-          input: await sharp(Buffer.from(`<svg><rect x="0" y="0" width="${meta.width}" height="${meta.height}" rx="12" ry="12" stroke="${chatBorderColor}" stroke-width="2" fill="#0000"/></svg>`)).resize(meta.width, meta.height).png().toBuffer(),
+          input: await sharp(Buffer.from(`<svg><rect x="0" y="0" width="${meta.width}" height="${meta.height}" rx="${fz(1.5)}" ry="${fz(1.5)}" stroke="${chatBorderColor}" stroke-width="2" fill="#0000"/></svg>`)).resize(meta.width, meta.height).png().toBuffer(),
           left: 0,
           top: 0
         }]).png().toBuffer()
         draw({
           input: buf,
-          left: 96,
+          left: fz(12),
           top: move() + th
         })
-        th += meta.height + 8
+        th += meta.height + fz(1)
         continue
       }
       isImage = true
       if (!line.trim().length) continue
-      const text = textPng({ text: line.trim(), maxWidth: imageWidth - 140, color: '#ecf2fb' })
+      const text = textPng({ text: line.trim(), maxWidth: imageWidth - fz(17.5), color: '#ecf2fb' })
       const tmeta = await text.metadata()
       const bg = roundSvg({
-        width: tmeta.width + 32,
-        height: tmeta.height + 32,
-        rx: 12,
-        ry: 12
+        width: tmeta.width + fz(4),
+        height: tmeta.height + fz(4),
+        rx: fz(1.5),
+        ry: fz(1.5)
       })
       draw({
         input: await sharp({
           create: {
-            width: tmeta.width + 32,
-            height: tmeta.height + 32,
+            width: tmeta.width + fz(4),
+            height: tmeta.height + fz(4),
             channels: 4,
             background: '#4b5a6f'
           }
@@ -173,18 +176,18 @@ const drawStudent = async (talk, draw, move, images = []) => {
           input: bg,
           blend: 'dest-in'
         }]).png().toBuffer(),
-        left: 96,
+        left: fz(12),
         top: move() + th
       }, {
         input: await text.toBuffer(),
-        left: 112,
-        top: move() + 16 + th
+        left: fz(14),
+        top: move() + fz(2) + th
       })
-      th += tmeta.height + 40
+      th += tmeta.height + fz(5)
     }
   }
-  th += 8
-  move(th > 72 ? th : 72)
+  th += fz(1)
+  move(th > fz(9) ? th : fz(9))
 }
 /**
  * @param { { content: string } } talk
@@ -200,11 +203,11 @@ const drawTeacher = async (talk, draw, move, images = []) => {
     const texts = line.split(/\[img\:(\d+)\]/g)
     if (isFirst && texts[0]?.trim()) {
       draw({
-        input: Buffer.from(`<svg height="10" width="12">
-          <polygon points="0,0 0,10 12,5" style="fill:#4a8ac6" />
+        input: Buffer.from(`<svg height="${fz(1.5)}" width="${fz(1.5)}">
+          <polygon points="0,0 0,${fz(1.5)} ${fz(1.5)},${fz(0.75)}" style="fill:#4a8ac6" />
         </svg>`),
-        left: imageWidth - 20,
-        top: move() + 14 + th
+        left: imageWidth - fz(3),
+        top: move() + fz(2) + th
       })
     }
     let isImage = false
@@ -213,40 +216,40 @@ const drawTeacher = async (talk, draw, move, images = []) => {
         isImage = false
         const content = images[Number(line) - 1]
         if (!content) continue
-        const img = sharp(await sharp(content).resize(300).toBuffer())
+        const img = sharp(await sharp(content).resize(fz(37.5)).toBuffer())
         const meta = await img.metadata()
         // console.log(meta.width, meta.height)
         const buf = await img.composite([{
-          input: roundSvg({ width: meta.width, height: meta.height, rx: 12, ry: 12 }),
+          input: roundSvg({ width: meta.width, height: meta.height, rx: fz(1.5), ry: fz(1.5) }),
           blend: 'dest-in'
         }, {
-          input: await sharp(Buffer.from(`<svg><rect x="0" y="0" width="${meta.width}" height="${meta.height}" rx="12" ry="12" stroke="${chatBorderColor}" stroke-width="2" fill="#0000"/></svg>`)).resize(meta.width, meta.height).png().toBuffer(),
+          input: await sharp(Buffer.from(`<svg><rect x="0" y="0" width="${meta.width}" height="${meta.height}" rx="${fz(1.5)}" ry="${fz(1.5)}" stroke="${chatBorderColor}" stroke-width="2" fill="#0000"/></svg>`)).resize(meta.width, meta.height).png().toBuffer(),
           left: 0,
           top: 0
         }]).png().toBuffer()
         draw({
           input: buf,
-          left: imageWidth - meta.width - 20,
+          left: imageWidth - meta.width - fz(3),
           top: move() + th
         })
-        th += meta.height + 8
+        th += meta.height + fz(1)
         continue
       }
       isImage = true
       if (!line.trim().length) continue
-      const text = textPng({ text: line.trim(), maxWidth: imageWidth - 140, color: '#ecf2fb' })
+      const text = textPng({ text: line.trim(), maxWidth: imageWidth - fz(17.5), color: '#ecf2fb' })
       const tmeta = await text.metadata()
       const bg = roundSvg({
-        width: tmeta.width + 32,
-        height: tmeta.height + 32,
-        rx: 12,
-        ry: 12
+        width: tmeta.width + fz(4),
+        height: tmeta.height + fz(4),
+        rx: fz(1.5),
+        ry: fz(1.5)
       })
       draw({
         input: await sharp({
           create: {
-            width: tmeta.width + 32,
-            height: tmeta.height + 32,
+            width: tmeta.width + fz(4),
+            height: tmeta.height + fz(4),
             channels: 4,
             background: '#4a8ac6'
           }
@@ -254,18 +257,18 @@ const drawTeacher = async (talk, draw, move, images = []) => {
           input: bg,
           blend: 'dest-in'
         }]).png().toBuffer(),
-        left: imageWidth - tmeta.width - 52,
+        left: imageWidth - tmeta.width - fz(7),
         top: move() + th
       }, {
         input: await text.toBuffer(),
-        left: imageWidth - tmeta.width - 36,
-        top: move() + 16 + th
+        left: imageWidth - tmeta.width - fz(5),
+        top: move() + fz(2) + th
       })
-      th += tmeta.height + 40
+      th += tmeta.height + fz(5)
     }
   }
-  th += 8
-  move(th > 72 ? th : 72)
+  th += fz(1)
+  move(th > fz(9) ? th : fz(9))
 }
 /**
  * @param { { content: string[]|string } } talk
@@ -280,79 +283,79 @@ const drawOptions = async (talk, draw, move, images = []) => {
   const leftColor = '#3198de'
   const textColor = '#4b5a6f'
   // background: #ffedf1
-  const width = imageWidth - 116
+  const width = imageWidth - fz(16)
   let height = 0
   const title = textPng({
     text: momoConfig.optionTitle,
     color: textColor,
-    maxWidth: width - 20
+    maxWidth: width - fz(2.5)
   })
-  const leftLine = Buffer.from(`<svg><rect x="0" y="0" width="4" height="30" fill="${leftColor}"/></svg>`)
+  const leftLine = Buffer.from(`<svg><rect x="0" y="0" width="${fz(0.5)}" height="${fz(3.75)}" fill="${leftColor}"/></svg>`)
   const titleMeta = await title.metadata()
-  height = titleMeta.height + 12
-  const splitLine = Buffer.from(`<svg><rect x="0" y="0" width="${width - 40}" height="2" fill="${chatBorderColor}"/></svg>`)
-  height += 14
+  height = titleMeta.height + fz(1.5)
+  const splitLine = Buffer.from(`<svg><rect x="0" y="0" width="${width - fz(5)}" height="3" fill="${chatBorderColor}"/></svg>`)
+  height += fz(1.75)
   const options = (await Promise.all(content.map(async text => {
     if (!text.trim()) return null
     const img = textPng({
       text,
       color: textColor,
-      maxWidth: width - 40,
+      maxWidth: width - fz(5),
       align: 'center'
     })
     const meta = await img.metadata()
     const bg = Buffer.from(`<svg><rect
       x="0" y="0"
-      width="${width - 32}" height="${meta.height + 24}"
+      width="${width - fz(4)}" height="${meta.height + fz(3)}"
       fill="${optionBgColor}"
       stroke="${chatBorderColor}" stroke-width="2"
-      rx="12" ry="12"
+      rx="${fz(1.5)}" ry="${fz(1.5)}"
     /></svg>`)
     return {
       width: meta.width,
-      height: meta.height + 24,
+      height: meta.height + fz(3),
       img, bg
     }
   }))).filter(i => i)
-  height += options.reduce((p, c) => p + c.height + 12, 0)
-  const left = imageWidth - width - 20
+  height += options.reduce((p, c) => p + c.height + fz(1.5), 0)
+  const left = imageWidth - width - fz(3)
   draw({
     input: Buffer.from(`<svg><rect
       x="0" y="0"
-      width="${width}" height="${height + 12}"
+      width="${width}" height="${height + fz(1.5)}"
       fill="${bgColor}"
       stroke="${chatBorderColor}" stroke-width="2"
-      rx="12" ry="12"
+      rx="${fz(1.5)}" ry="${fz(1.5)}"
     /></svg>`),
     left,
     top: move()
   }, {
     input: leftLine,
-    left: left + 16,
-    top: move() + 12
+    left: left + fz(2),
+    top: move() + fz(1.5)
   }, {
     input: await title.toBuffer(),
-    left: left + 28,
-    top: move() + 10
+    left: left + fz(3.5),
+    top: move() + fz(1.25)
   }, {
     input: splitLine,
-    left: left + 18,
-    top: move() + 12 + titleMeta.height + 8,
+    left: left + fz(2.25),
+    top: move() + fz(1.5) + titleMeta.height + fz(1),
   })
-  let dh = move() + 12 + titleMeta.height + 20
+  let dh = move() + fz(1.5) + titleMeta.height + fz(2.5)
   for (const opt of options) {
     draw({
       input: opt.bg,
-      left: left + 18,
+      left: left + fz(2.25),
       top: dh,
     }, {
       input: await opt.img.toBuffer(),
       left: left + Math.floor((width - opt.width) / 2),
-      top: dh + 12
+      top: dh + fz(1.5)
     })
-    dh += opt.height + 12
+    dh += opt.height + fz(1.5)
   }
-  move(height + 24)
+  move(height + fz(3))
 }
 /**
  * @param { { student: Student, content: string } } talk
@@ -363,65 +366,65 @@ const drawKizuna = async (talk, draw, move) => {
   const name = talk.student.DisplayName || talk.student.Name
   const content = talk.content.trim() || `进入${name}的好感故事`
   // background: #ffedf1
-  const width = imageWidth - 116
+  const width = imageWidth - fz(16)
   let height = 0
   const title = textPng({
     text: momoConfig.kizunaTitle,
     color: '#4b5a6f',
-    maxWidth: width - 20
+    maxWidth: width - fz(2.5)
   })
-  const leftLine = Buffer.from(`<svg><rect x="0" y="0" width="4" height="30" fill="#ff8ba0"/></svg>`)
+  const leftLine = Buffer.from(`<svg><rect x="0" y="0" width="${fz(0.5)}" height="${fz(3.75)}" fill="#ff8ba0"/></svg>`)
   const titleMeta = await title.metadata()
-  height = titleMeta.height + 12
-  const splitLine = Buffer.from(`<svg><rect x="0" y="0" width="${width - 40}" height="2" fill="${chatBorderColor}"/></svg>`)
-  height += 14
+  height = titleMeta.height + fz(1.5)
+  const splitLine = Buffer.from(`<svg><rect x="0" y="0" width="${width - fz(5)}" height="3" fill="${chatBorderColor}"/></svg>`)
+  height += fz(1.75)
   // console.log(content)
   const main = textPng({
     text: content,
     color: '#ffedf1',
-    maxWidth: width - 40,
+    maxWidth: width - fz(5),
     align: 'center'
   })
   const meta = await main.metadata()
   const mainBg = Buffer.from(`<svg>
     <rect x="0" y="0"
-      width="${width - 32}" height="${meta.height + 24}"
+      width="${width - fz(4)}" height="${meta.height + fz(3)}"
       stroke="${chatBorderColor}" stroke-width="2"
       fill="#ff8ba0"
-    rx="12" ry="12"/>
+    rx="${fz(1.5)}" ry="${fz(1.5)}"/>
   </svg>`)
-  height += meta.height + 44
+  height += meta.height + fz(5.5)
   // console.log(width, height, chatBorderColor)
   const bg = Buffer.from(`<svg>
-    <rect x="0" y="0" width="${width}" height="${height}" stroke="${chatBorderColor}" stroke-width="2" fill="#ffecf2" rx="12" ry="12"/>
+    <rect x="0" y="0" width="${width}" height="${height}" stroke="${chatBorderColor}" stroke-width="2" fill="#ffecf2" rx="${fz(1.5)}" ry="${fz(1.5)}"/>
   </svg>`)
-  const left = 96
+  const left = fz(13)
   draw({
     input: bg,
     left,
     top: move()
   }, {
     input: leftLine,
-    left: left + 16,
-    top: move() + 12
+    left: left + fz(2),
+    top: move() + fz(1.5)
   }, {
     input: await title.toBuffer(),
-    left: left + 28,
-    top: move() + 10
+    left: left + fz(3.5),
+    top: move() + fz(1.25)
   }, {
     input: splitLine,
-    left: left + 18,
-    top: move() + 12 + titleMeta.height + 8,
+    left: left + fz(2.25),
+    top: move() + fz(1.5) + titleMeta.height + fz(1),
   }, {
     input: mainBg,
-    left: left + 18,
-    top: move() + 16 + titleMeta.height + 18
+    left: left + fz(2.25),
+    top: move() + fz(2) + titleMeta.height + fz(2.25)
   }, {
     input: await main.toBuffer(),
     left: left + Math.floor((width - meta.width) / 2),
-    top: move() + 16 + titleMeta.height + 30
+    top: move() + fz(2) + titleMeta.height + fz(3.75)
   })
-  move(height + 12)
+  move(height + fz(1.5))
 }
 /**
  * @function momotalk
@@ -431,7 +434,7 @@ const drawKizuna = async (talk, draw, move) => {
 const momotalk = async (talks, images = [], watermark = '') => {
   /** @type { import('sharp').OverlayOptions[] } */
   const comps = []
-  let imageHeight = 8
+  let imageHeight = fz(1.5)
   /** @param { import('sharp').OverlayOptions[] } args */
   const draw = (...args) => comps.push(...args)
   const move = (h = 0) => {
@@ -442,43 +445,43 @@ const momotalk = async (talks, images = [], watermark = '') => {
   // Title
   const titleBg = await sharp({
     create: {
-      width: imageWidth - 12,
-      height: 64,
+      width: imageWidth - fz(3),
+      height: fz(8),
       channels: 4,
       background: momoConfig.titleBackground
     }
   }).composite([{
-    input: roundSvg({ width: imageWidth - 12, height: 64, rx: 18, ry: 18 }),
+    input: roundSvg({ width: imageWidth - fz(3), height: fz(8), rx: fz(2.25), ry: fz(2.25) }),
     blend: 'dest-in'
   }]).png().toBuffer()
   draw({
     input: titleBg,
-    left: 6,
+    left: fz(1.5),
     top: move()
   }, {
-    input: await sharp(momoConfig.titleIcon || momoSvg).resize(36, 36).png().toBuffer(),
-    left: 24,
-    top: move() + 12,
+    input: await sharp(momoConfig.titleIcon || momoSvg).resize(fz(4.5), fz(4.5)).png().toBuffer(),
+    left: fz(4),
+    top: move() + fz(1.5),
   }, {
     input: await textPng({
       text: momoConfig.title,
-      fontSize: 36,
+      fontSize: fz(4.5),
       color: 'white',
       font: miSans,
       fontfile: miSansFile
     }).toBuffer(),
-    left: 72,
-    top: move() + 16
+    left: fz(10),
+    top: move() + fz(2)
   }, {
     input: await textPng({
       text: 'X',
-      fontSize: 40,
+      fontSize: fz(5),
       color: 'white',
     }).toBuffer(),
-    left: imageWidth - 52,
-    top: move() + 16
+    left: imageWidth - fz(7),
+    top: move() + fz(2)
   })
-  move(84)
+  move(fz(10.5))
 
   for (const m of talks) {
     switch (m.type) {
@@ -495,14 +498,14 @@ const momotalk = async (talks, images = [], watermark = '') => {
         await drawKizuna(m, draw, move, images)
         break
     }
-    move(12)
+    move(fz(1.5))
   }
 
   if (watermark.trim().length) {
     const wm = textPng({
       text: watermark.trim(),
-      fontSize: 20,
-      maxWidth: imageWidth - 48,
+      fontSize: fz(2.5),
+      maxWidth: imageWidth - fz(6),
       color: fontGrey,
       font: miSans,
       fontfile: miSansFile
@@ -513,7 +516,7 @@ const momotalk = async (talks, images = [], watermark = '') => {
       left: Math.floor((imageWidth - meta.width) / 2),
       top: move()
     })
-    move(meta.height + 12)
+    move(meta.height + fz(1.5))
   }
 
   // imageHeight += 12

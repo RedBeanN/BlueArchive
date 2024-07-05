@@ -62,8 +62,8 @@ const rect = (props = '') => Buffer.from(`<svg><rect x="0" y="0" ${props} /></sv
 // Fonts and colors
 const miSansFile = resolve(__dirname, '../assets/fonts/MiSans-Bold.ttf')
 const miSans = 'MiSans Bold'
-const defaultFontfile = resolve(__dirname, '../assets/fonts/Yuanti SC.ttc')
-const defaultFont = 'Yuanti SC Bold'
+const defaultFontfile = resolve(__dirname, '../assets/fonts/ResourceHanRoundedCN.ttf')
+const defaultFont = 'Resource Han Rounded CN Medium'
 const black = '#2a323e'
 const white = '#ecf2fb'
 const grey = '#87929e'
@@ -328,8 +328,8 @@ const drawFavors = async (s, draw, move, t) => {
   }
   // Furniture
   let furh = 0
-  const furInt = s.FurnitureInteraction[0]
-  const furnitures = furInt.map(i => getFurnitureById(i)).filter(i => i.Tags.some(t => s.FavorItemUniqueTags.includes(t)))
+  const furInt = s.FurnitureInteraction[0]?.[0] || []
+  const furnitures = furInt.map(i => getFurnitureById(i)).filter(i => i && i.Tags.some(t => s.FavorItemUniqueTags.includes(t)))
   if (furnitures.length) {
     /** @type { import('../types/furniture').Furniture[][] } */
     const furs = []
