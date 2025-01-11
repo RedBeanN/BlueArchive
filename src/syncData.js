@@ -5,7 +5,14 @@ const { Agent } = require('https')
 const sharp = require('sharp')
 const parallel = require('../utils/parallel')
 
-const dataRepo = 'https://github.com/lonqie/SchaleDB'
+/**
+ * TODO: The SchaleDB repo stopped updating assets since Aug 20, 2024.
+ * We should directly use assets from its website. Example:
+ * https://schaledb.com/data/cn/students.min.json
+ * https://schaledb.com/images/item/icon/currency_icon_gold.webp
+ * Many file urls may be changed so we should check all files carefully.
+ */
+const dataRepo = 'https://github.com/SchaleDB/SchaleDB'
 const dataRepoGitee = 'https://gitee.com/wangecloud/SchaleDB'
 
 const langs = ['cn', 'jp', 'en', 'tw', 'kr', 'th']
