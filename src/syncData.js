@@ -99,7 +99,7 @@ const tryWithMirror = async (path = '', dist = '', force = false) => {
   const schaleUrl = schaleApi + path
   const schaleRes = await downloadWithRetry(schaleUrl, dist, force)
   if (schaleRes) {
-    console.log(`Downloaded ${path} from schale`)
+    // console.log(`Downloaded ${path} from schale`)
     return schaleRes
   }
   if (!isGithubOk) {
