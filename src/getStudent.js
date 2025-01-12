@@ -8,14 +8,37 @@ const langs = ['cn', 'jp', 'en', 'tw', 'kr', 'th', 'vi']
 const studentMap = new Map()
 
 const customStudents = require('./customStudents')
+const asArray = require('../utils/asArray')
 
 let _initted = false
+const skillKeyMap = {
+  Ex: 'ex',
+  Public: 'normal',
+  GearPublic: 'normal',
+  Passive: 'passive',
+  WeaponPassive: 'passive',
+  ExtraPassive: 'sub',
+}
 const initStudentMap = () => {
   if (_initted) return
   for (const l of langs) {
     const p = resolve(__dirname, `../assets/data/${l}/students.json`)
     if (existsSync(p)) {
-      studentMap.set(l, JSON.parse(readFileSync(p, 'utf-8')))
+      const students = asArray(JSON.parse(readFileSync(p, 'utf-8')))
+      // Fix Skills types
+      for (const s of students) {
+        const skills = []
+        for (const key in s.Skills) {
+          if (key in skillKeyMap) {
+            skills.push({
+              SkillType: skillKeyMap[key],
+              ...s.Skills[key],
+            })
+          }
+        }
+        s.Skills = skills
+      }
+      studentMap.set(l, students)
     }
   }
   _initted = true
@@ -70,7 +93,10 @@ const searchByName = (name = '', specs = []) => {
   }
   // 水宫子 => 宫子(泳装)
   if (!found.length && lc.startsWith('水')) {
-    return searchByName(lc.substring(1) + '(泳装)', specs)
+    return [
+      ...searchByName(lc.substring(1) + '(泳装)', specs),
+      ...searchByName(lc.substring(1) + '（泳装）', specs),
+    ]
   }
   return found
 }

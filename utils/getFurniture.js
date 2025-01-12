@@ -1,5 +1,6 @@
-const cns = require('../assets/data/cn/furniture.json')
-const furniture = require('../assets/data/jp/furniture.json')
+const asArray = require('./asArray')
+const cns = asArray(require('../assets/data/cn/furniture.json'))
+const furniture = asArray(require('../assets/data/jp/furniture.json'))
 
 /**
  * @param { number } id

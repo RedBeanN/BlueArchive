@@ -1,5 +1,6 @@
-const cns = require('../assets/data/cn/items.json')
-const items = require('../assets/data/jp/items.json')
+const asArray = require('./asArray')
+const cns = asArray(require('../assets/data/cn/items.json'))
+const items = asArray(require('../assets/data/jp/items.json'))
 
 /**
  * @function getFavorsByTags

@@ -6,7 +6,7 @@ const { getStudentById } = require('./getStudent')
 const localize = require('../utils/localize')
 const CharacterStats = require('../utils/CharacterStats')
 const getEquipment = require('../utils/getEquipment')
-const getBondStats = require('../utils/getBoundStats')
+const getBoundStats = require('../utils/getBoundStats')
 const { getFavorsByTags } = require('../utils/getItem')
 const { getFurnitureById } = require('../utils/getFurniture')
 const parseRichText = require('../utils/parseRichText')
@@ -416,24 +416,25 @@ const drawAdapt = async (s, draw, move, t) => {
 
 /** @type { DrawFunction } */
 const drawStats = async (s, draw, move, t) => {
-  const baseStat = new CharacterStats(s, 87, s.StarGrade)
-  const stats = new CharacterStats(s, 87, 5)
+  const baseStat = new CharacterStats(s, 90, s.StarGrade)
+  console.log(baseStat.stats)
+  const stats = new CharacterStats(s, 90, 5)
   for (const cate of s.Equipment) {
-    const eq = getEquipment(cate, 8)
+    const eq = getEquipment(cate)
     if (eq) {
       for (let i = 0; i < eq.StatType.length; i++) {
         stats.addBuff(eq.StatType[i], eq.StatValue[i][1])
       }
     }
   }
-  const bond = getBondStats(s, 50)
-  for (const key in bond) {
-    stats.addBuff(key, bond[key])
+  const bound = getBoundStats(s, 50)
+  for (const key in bound) {
+    stats.addBuff(key, bound[key])
   }
   for (const alt of s.FavorAlts) {
-    const bond = getBondStats(getStudentById(alt), 50)
-    for (const key in bond) {
-      stats.addBuff(key, bond[key])
+    const bound = getBoundStats(getStudentById(alt), 50)
+    for (const key in bound) {
+      stats.addBuff(key, bound[key])
     }
   }
   const defaultLeft = 56
@@ -529,7 +530,7 @@ const drawSkills = async (s, draw, move, t, lang = 'cn') => {
     }]).png()
     const title = textPng({ text: sk.Name, fontSize: 28, color: black })
     const sub = textPng({ text: stype, fontSize: 20, color: black })
-    const dtext = parseRichText({ text: sk.Desc, params: sk.Parameters, level: 5, lang })
+    const dtext = parseRichText({ text: sk.Desc, params: sk.Parameters, level: sk.Parameters[0]?.length, lang })
     const desc = descPng(dtext)
     const tmeta = await title.metadata()
     const dmeta = await desc.metadata()

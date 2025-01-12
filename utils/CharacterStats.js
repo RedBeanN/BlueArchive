@@ -189,9 +189,11 @@ class CharacterStats {
     this.stats['ExtendDebuffDuration'] = [10000, 0, 1, 0]
     this.stats['ExtendCCDuration'] = [10000, 0, 1, 0]
 
-    Object.entries(getWeaponStats(character, 50)).forEach(([key, value]) => {
-      this.addBuff(key, value)
-    })
+    if (stargrade >= 5) {
+      Object.entries(getWeaponStats(character, 50)).forEach(([key, value]) => {
+        this.addBuff(key, value)
+      })
+    }
   }
 
   addBuff (stat, amount, separatedFlat = false) {
