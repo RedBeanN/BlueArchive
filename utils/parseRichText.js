@@ -37,6 +37,7 @@ const parseRichText = ({
   .replace(/<c\:(.+?)>/g, (_, v) => {
     return `<span color="#ff9700">${c(v)}</span>`
   })
+  .replace(/&nbsp;/g, '')
 }
 
 module.exports = parseRichText

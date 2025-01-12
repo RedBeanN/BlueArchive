@@ -229,7 +229,7 @@ const syncData = async (log = () => {}) => {
   const equips = ['Badge', 'Bag', 'Charm', 'Gloves', 'Hairpin', 'Hat', 'Necklace', 'Shoes', 'Watch']
   await parallel(equips, async e => {
     const local = resolve(__dirname, `../assets/equipments/${e}.png`)
-    const remotePath = `/images/equipment/icon/equipment_icon_${e.toLowerCase()}_tier8.png`
+    const remotePath = `/images/equipment/icon/equipment_icon_${e.toLowerCase()}_tier9.webp`
     if (await tryWithMirror(remotePath, local)) {
       log(`Equipment: ${e}`)
     }
@@ -251,7 +251,7 @@ const syncData = async (log = () => {}) => {
   })
 
   // Items
-  const jpItemData = JSON.parse(readFileSync(resolve(__dirname, '../assets/data/jp/items.json'), 'utf-8'))
+  const jpItemData = asArray(JSON.parse(readFileSync(resolve(__dirname, '../assets/data/jp/items.json'), 'utf-8')))
   await parallel(jpItemData, async item => {
     const { Id, Icon, Name } = item
     const local = resolve(__dirname, `../assets/items/${Id}.png`)
@@ -262,7 +262,7 @@ const syncData = async (log = () => {}) => {
   }, 10)
   
   // Furnitures
-  const jpFurnitureData = JSON.parse(readFileSync(resolve(__dirname, '../assets/data/jp/furniture.json'), 'utf-8'))
+  const jpFurnitureData = asArray(JSON.parse(readFileSync(resolve(__dirname, '../assets/data/jp/furniture.json'), 'utf-8')))
   await parallel(jpFurnitureData, async item => {
     const { Id, Icon, Name } = item
     const local = resolve(__dirname, `../assets/furnitures/${Id}.png`)
