@@ -417,7 +417,6 @@ const drawAdapt = async (s, draw, move, t) => {
 /** @type { DrawFunction } */
 const drawStats = async (s, draw, move, t) => {
   const baseStat = new CharacterStats(s, 90, s.StarGrade)
-  console.log(baseStat.stats)
   const stats = new CharacterStats(s, 90, 5)
   for (const cate of s.Equipment) {
     const eq = getEquipment(cate)
